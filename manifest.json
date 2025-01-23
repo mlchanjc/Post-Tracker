@@ -1,0 +1,28 @@
+{
+  "name": "Post Tracker",
+  "version": "1.0",
+  "description": "",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": ["https://www.instagram.com/*", "https://www.threads.net/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*", "https://www.threads.net/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [],
+      "matches": ["https://www.instagram.com/*", "https://www.threads.net/*"]
+    }
+  ],
+  "action": {
+    "default_icon": {},
+    "default_title": "Post Tracker",
+    "default_popup": "popup.html"
+  },
+  "manifest_version": 3
+}
