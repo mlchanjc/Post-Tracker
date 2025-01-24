@@ -1,71 +1,67 @@
-const commentList = document.getElementById("commentList");
+const postList = document.getElementById("postList");
 
-const options = {
-	includeScore: true,
-	threshold: 0.3,
-	keys: ["username"],
+const fuseOptions = {
+  includeScore: true,
+  threshold: 0.3,
+  keys: ["username"],
 };
-
-function fuzzySearch(query) {
-	return fuse.search(query).map((result) => result.item.name);
-}
 
 let searchText = "";
 
-// Function to display comments
-function displayComments() {
-	chrome.storage.local.get(["postDetails"], ({ postDetails }) => {
-		commentList.innerHTML = ""; // Clear previous comments
+function displayPosts() {
+  chrome.storage.local.get(["postDetails"], ({ postDetails }) => {
+    postList.innerHTML = ""; // Clear previous posts
 
-		if (!!!postDetails) return;
+    if (!!!postDetails) return;
 
-		const fuse = new Fuse(postDetails, options);
+    const fuse = new Fuse(postDetails, fuseOptions);
 
-		postDetails = fuse.search(searchText).map((result) => result.item.username);
+    if (searchText !== "")
+      postDetails = fuse.search(searchText).map((result) => result.item);
 
-		postDetails.forEach((post) => {
-			const commentDiv = document.createElement("div");
-			commentDiv.className = "comment";
+    postDetails.forEach((post) => {
+      const postDiv = document.createElement("div");
+      postDiv.className = "post";
 
-			const avatarImg = document.createElement("img");
+      const avatarImg = document.createElement("img");
 
-			avatarImg.src = post.userAvatar || "placeholder-avatar.png"; // Use a placeholder if no avatar
-			avatarImg.className = "avatar";
+      avatarImg.src = post.userAvatar || "placeholder-avatar.png"; // Use a placeholder if no avatar
+      avatarImg.className = "avatar";
 
-			const contentDiv = document.createElement("div");
-			contentDiv.className = "content";
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "content";
 
-			const usernameDiv = document.createElement("div");
-			usernameDiv.className = "username";
-			usernameDiv.textContent = post.username;
+      const usernameDiv = document.createElement("div");
+      usernameDiv.className = "username";
+      usernameDiv.textContent = post.username;
 
-			const timeDiv = document.createElement("div");
-			timeDiv.className = "time";
-			timeDiv.textContent = new Date(post.accessTime).toLocaleString();
+      const timeDiv = document.createElement("div");
+      timeDiv.className = "time";
+      timeDiv.textContent = new Date(post.accessTime).toLocaleString();
 
-			const previewTextDiv = document.createElement("div");
-			previewTextDiv.className = "preview-text";
-			previewTextDiv.textContent = post.previewText;
+      const previewTextDiv = document.createElement("div");
+      previewTextDiv.className = "preview-text";
+      previewTextDiv.textContent = post.previewText;
 
-			contentDiv.appendChild(usernameDiv);
-			contentDiv.appendChild(timeDiv);
-			contentDiv.appendChild(previewTextDiv);
-			commentDiv.appendChild(avatarImg);
-			commentDiv.appendChild(contentDiv);
-			commentList.appendChild(commentDiv);
-		});
-	});
+      contentDiv.appendChild(usernameDiv);
+      contentDiv.appendChild(timeDiv);
+      contentDiv.appendChild(previewTextDiv);
+      postDiv.appendChild(avatarImg);
+      postDiv.appendChild(contentDiv);
+      postList.appendChild(postDiv);
+    });
+  });
 }
 
-displayComments();
+displayPosts();
 
 chrome.storage.onChanged.addListener((changes, area) => {
-	if (area === "local" && changes.postDetails) {
-		displayComments();
-	}
+  if (area === "local" && changes.postDetails) {
+    displayPosts();
+  }
 });
 
 document.getElementById("search").addEventListener("input", (event) => {
-	searchText = event.target.value;
-	displayComments();
+  searchText = event.target.value;
+  displayPosts();
 });

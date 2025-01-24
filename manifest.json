@@ -3,7 +3,10 @@
   "version": "1.0",
   "description": "",
   "permissions": ["storage", "tabs"],
-  "host_permissions": ["https://www.instagram.com/*", "https://www.threads.net/*"],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "https://www.threads.net/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
